@@ -1,6 +1,6 @@
 # Google Colab Runbook
 
-Open a new Google Colab notebook and run these cells from top to bottom.
+This is the easiest way to run the full project in a Colab notebook without setting up anything locally. Just open a new notebook and run each cell in order.
 
 ## 1. Clone the repository
 
@@ -9,11 +9,13 @@ Open a new Google Colab notebook and run these cells from top to bottom.
 %cd Capstone_Project
 ```
 
-## 2. Install dependencies
+## 2. Install the project dependencies
 
 ```python
 !pip install -q -r requirements.txt
 ```
+
+This installs the packages needed for the data pipeline, analytics scripts, and the FastAPI support assistant.
 
 ## 3. Run the data pipeline
 
@@ -21,7 +23,7 @@ Open a new Google Colab notebook and run these cells from top to bottom.
 !python data_pipeline/pipeline.py
 ```
 
-Verify its outputs:
+After it finishes, you can confirm the expected files were created:
 
 ```python
 from pathlib import Path
@@ -34,13 +36,15 @@ for path in [
     print(path, path.exists())
 ```
 
-## 4. Run analytics
+This step scrapes book data, cleans it, converts the prices, and stores the results in SQLite.
+
+## 4. Run the analytics workflow
 
 ```python
 !python analytics/analysis.py
 ```
 
-Verify its outputs:
+To check that the analytics outputs were generated successfully:
 
 ```python
 for path in [
@@ -51,22 +55,26 @@ for path in [
 ]:
     print(path, path.exists())
 
-print(*sorted(Path("analytics/figures").glob("*.png")), sep="\n")
+print("\n".join(sorted(str(p) for p in Path("analytics/figures").glob("*.png"))))
 ```
 
-## 5. Test the support assistant
+This script explores the Titanic dataset, builds and compares models, and saves the best pipeline along with charts and a summary report.
+
+## 5. Run the support assistant directly
 
 ```python
 !python support_assistant/main.py
 ```
 
-## 6. Start the API in Colab
+This prints a quick example of the assistant answering a policy-style question.
+
+## 6. Start the API in the notebook
 
 ```python
 !uvicorn support_assistant.main:app --host 0.0.0.0 --port 8000 &
 ```
 
-The API can be tested inside Colab with:
+Once the app starts, you can send a request to the `/ask` endpoint:
 
 ```python
 import requests
@@ -78,4 +86,10 @@ response = requests.post(
 print(response.json())
 ```
 
-Colab has internet access, so the books scrape and the initial Titanic download should work. Generated artifacts remain in the Colab runtime until downloaded or committed back to GitHub.
+You should get a JSON response with the answer, sources, and confidence score.
+
+## Notes
+
+Colab has internet access, so the book scraping and the initial Titanic dataset download should work without extra setup. The generated outputs remain in the notebook runtime until you download them or save them back to GitHub.
+
+If you want to run the project again later, just start from the repository clone step and rerun the cells in order.
